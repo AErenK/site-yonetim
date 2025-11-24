@@ -77,12 +77,16 @@ export async function register(prevState: any, formData: FormData) {
         return { error: 'Bu email adresi zaten kayıtlı.' }
     }
 
+    // İlk kullanıcı ise ADMIN yap, değilse EMPLOYEE
+    const userCount = await prisma.user.count()
+    const role = userCount === 0 ? 'ADMIN' : 'EMPLOYEE'
+
     await prisma.user.create({
         data: {
             name,
             email,
             password,
-            role: 'EMPLOYEE', // Default role
+            role,
         },
     })
 
