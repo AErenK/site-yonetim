@@ -1,10 +1,11 @@
 'use client'
 
-import { login } from "@/actions/auth";
+import { register } from "@/actions/auth";
+import Link from "next/link";
 import { useActionState } from "react";
 
-export default function LoginPage() {
-  const [state, action, isPending] = useActionState(login, null);
+export default function RegisterPage() {
+  const [state, action, isPending] = useActionState(register, null);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -12,8 +13,8 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Hoş Geldiniz</h1>
-          <p className="text-slate-300">Site Yönetim Sistemi Girişi</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Kayıt Ol</h1>
+          <p className="text-slate-300">Yeni Çalışan Kaydı</p>
         </div>
 
         <form action={action} className="space-y-6">
@@ -22,7 +23,18 @@ export default function LoginPage() {
               {state.error}
             </div>
           )}
-          
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Ad Soyad</label>
+            <input
+              type="text"
+              name="name"
+              required
+              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Adınız Soyadınız"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Email Adresi</label>
             <input
@@ -30,7 +42,7 @@ export default function LoginPage() {
               name="email"
               required
               className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="admin@kartepe.com"
+              placeholder="email@ornek.com"
             />
           </div>
 
@@ -48,22 +60,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg transform transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg transform transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPending ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+            {isPending ? 'Kayıt Yapılıyor...' : 'Kayıt Ol'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/register" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
-            Hesabınız yok mu? Kayıt Olun
-          </a>
-        </div>
-
-        <div className="mt-6 text-center text-xs text-slate-500">
-          <p>Demo Hesaplar:</p>
-          <p>Admin: admin@kartepe.com / 123</p>
-          <p>Çalışan: ali@kartepe.com / 123</p>
+          <Link href="/" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+            Zaten hesabınız var mı? Giriş Yapın
+          </Link>
         </div>
       </div>
     </div>
