@@ -59,12 +59,6 @@ export default function LoginPage() {
             Hesabınız yok mu? Kayıt Olun
           </a>
         </div>
-
-        <div className="mt-6 text-center text-xs text-slate-500">
-          <p>Demo Hesaplar:</p>
-          <p>Admin: admin@kartepe.com / 123</p>
-          <p>Çalışan: ali@kartepe.com / 123</p>
-        </div>
       </div>
     </div>
   );
