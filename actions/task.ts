@@ -67,6 +67,7 @@ export async function completeTask(taskId: string, formData: FormData) {
     // Notify admin (creator)
     const task = await prisma.task.findUnique({ where: { id: taskId } })
     if (task) {
+        // Create in-app notification
         await prisma.notification.create({
             data: {
                 userId: task.createdById,
@@ -74,8 +75,25 @@ export async function completeTask(taskId: string, formData: FormData) {
             },
         })
 
-        // Send Push to Admin
+        // Send Push to Admin (Creator)
+        console.log(`Sending completion push to admin (creator): ${task.createdById}`)
         await sendPushNotification(task.createdById, `${session.name} görevi tamamladı: ${task.title}`)
+        
+        // Also send to ALL admins just in case the creator is not the current admin
+        // This ensures at least one admin gets it if the creator account is deleted or changed
+        if (task.createdById !== session.id) { // Don't send to self if admin completed their own task (rare)
+             const admins = await prisma.user.findMany({
+                where: { 
+                    role: 'ADMIN',
+                    id: { not: task.createdById } // Avoid duplicate if creator is already in this list
+                }
+            })
+            
+            for (const admin of admins) {
+                console.log(`Sending completion push to other admin: ${admin.id}`)
+                await sendPushNotification(admin.id, `${session.name} görevi tamamladı: ${task.title}`)
+            }
+        }
     }
 
     revalidatePath('/employee')
