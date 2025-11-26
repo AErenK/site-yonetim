@@ -1,10 +1,26 @@
 'use client'
 
 import { login } from "@/actions/auth";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getSession } from "@/actions/auth";
 
 export default function LoginPage() {
   const [state, action, isPending] = useActionState(login, null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    getSession().then((session) => {
+      if (session) {
+        if (session.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/employee');
+        }
+      }
+    });
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
