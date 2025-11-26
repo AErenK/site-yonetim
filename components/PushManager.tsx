@@ -82,9 +82,17 @@ export function PushManager() {
             setIsSubscribed(true)
             setShowModal(false) // Close modal if open
             alert("Bildirimler başarıyla açıldı!")
-        } catch (error) {
+        } catch (error: any) {
             console.error("Subscription failed", error)
-            alert("Bildirim izni alınamadı veya bir hata oluştu.")
+            
+            // Check for iOS specific error (usually related to not being added to home screen)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+            
+            if (isIOS) {
+                alert("iPhone'da bildirimleri açmak için:\n1. 'Paylaş' butonuna basın\n2. 'Ana Ekrana Ekle'yi seçin\n3. Uygulamayı ana ekrandan açıp tekrar deneyin.")
+            } else {
+                alert("Hata oluştu: " + (error.message || "Bilinmeyen hata"))
+            }
         } finally {
             setIsLoading(false)
         }
