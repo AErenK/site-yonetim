@@ -3,42 +3,24 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-    // Create Admin
-    const admin = await prisma.user.upsert({
-        where: { email: 'admin@kartepe.com' },
-        update: {},
-        create: {
+    // WARNING: This will DELETE all data in related tables.
+    // We delete dependent tables first to avoid FK constraint errors.
+    await prisma.pushSubscription.deleteMany().catch(() => {})
+    await prisma.notification.deleteMany().catch(() => {})
+    await prisma.task.deleteMany().catch(() => {})
+    await prisma.user.deleteMany().catch(() => {})
+
+    // Create a single admin user
+    const admin = await prisma.user.create({
+        data: {
             email: 'admin@kartepe.com',
             name: 'Site Yöneticisi',
-            password: '123', // In real app, hash this!
+            password: '123', // Change this after first login
             role: 'ADMIN',
         },
     })
 
-    // Create Employees
-    const emp1 = await prisma.user.upsert({
-        where: { email: 'ali@kartepe.com' },
-        update: {},
-        create: {
-            email: 'ali@kartepe.com',
-            name: 'Ali Yılmaz',
-            password: '123',
-            role: 'EMPLOYEE',
-        },
-    })
-
-    const emp2 = await prisma.user.upsert({
-        where: { email: 'veli@kartepe.com' },
-        update: {},
-        create: {
-            email: 'veli@kartepe.com',
-            name: 'Veli Demir',
-            password: '123',
-            role: 'EMPLOYEE',
-        },
-    })
-
-    console.log({ admin, emp1, emp2 })
+    console.log('DB reset complete. Created admin:', admin.email)
 }
 
 main()
