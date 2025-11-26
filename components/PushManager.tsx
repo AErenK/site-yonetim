@@ -52,7 +52,11 @@ export function PushManager() {
             // Request permission explicitly first to satisfy "user gesture" requirement
             const permission = await Notification.requestPermission()
             if (permission !== 'granted') {
-                alert("Bildirim izni reddedildi.")
+                if (permission === 'denied') {
+                    alert("Bildirim izni daha önce reddedilmiş.\n\nLütfen tarayıcı ayarlarından (Site Ayarları) bildirim iznini 'Sıfırla' veya 'İzin Ver' olarak değiştirin.")
+                } else {
+                    alert("Bildirim izni verilmedi.")
+                }
                 setIsLoading(false)
                 return
             }
