@@ -36,10 +36,10 @@ model Task {
   costDescription String?
   
   assignedToId    String
-  assignedTo      User     @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedTo      User     @relation("AssignedTo", fields: [assignedToId], references: [id], onDelete: Cascade)
   
   createdById     String
-  createdBy       User     @relation("CreatedBy", fields: [createdById], references: [id])
+  createdBy       User     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -50,7 +50,7 @@ model Notification {
   message   String
   read      Boolean  @default(false)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
@@ -60,6 +60,6 @@ model PushSubscription {
   p256dh    String
   auth      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
