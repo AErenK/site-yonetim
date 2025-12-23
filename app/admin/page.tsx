@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/actions/auth";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
-import { createTask, approveTask } from "@/actions/task";
+import { createTask, approveTask, deleteTask, extendTask } from "@/actions/task";
 import { markAsRead } from "@/actions/notification";
-import { Bell, CheckCircle, Clock, Plus, User } from "lucide-react";
+import { Bell, CheckCircle, Clock, Plus, User, Trash2, RefreshCw } from "lucide-react";
 import { PushManager } from "@/components/PushManager";
 import { UserList } from "@/components/UserList";
 
@@ -175,11 +175,6 @@ export default async function AdminPage() {
                                             <p className="text-sm text-emerald-400 mt-1">Masraf: {task.cost} TL ({task.costDescription})</p>
                                         )}
                                     </div>
-
-import { deleteTask, extendTask } from "@/actions/task";
-import { Trash2, RefreshCw } from "lucide-react";
-
-// ... existing code ...
 
                                     <div className="flex items-center gap-2">
                                         {task.status === 'COMPLETED' && (
