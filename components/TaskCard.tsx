@@ -13,19 +13,44 @@ type Task = {
     cost: number | null
     costDescription: string | null
     createdAt: Date
+    expiresAt: Date | null
+    isPermanent: boolean
+}
+
+function getRemainingTime(expiresAt: Date | null) {
+    if (!expiresAt) return null;
+    const now = new Date();
+    const diff = new Date(expiresAt).getTime() - now.getTime();
+    
+    if (diff <= 0) return "Süresi doldu";
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `${days} gün kaldı`;
+    return `${hours} saat kaldı`;
 }
 
 export function TaskCard({ task }: { task: Task }) {
     const [isCompleting, setIsCompleting] = useState(false)
+    const remainingTime = getRemainingTime(task.expiresAt)
 
     return (
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 backdrop-blur-sm hover:border-slate-700 transition-all">
             <div className="flex justify-between items-start mb-4">
                 <div>
                     <h3 className="text-lg font-semibold text-white mb-1">{task.title}</h3>
-                    <div className="flex items-center gap-2 text-slate-400 text-sm">
-                        <MapPin size={14} />
-                        <span>{task.siteName}</span>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 text-sm">
+                            <MapPin size={14} />
+                            <span>{task.siteName}</span>
+                        </div>
+                        {!task.isPermanent && remainingTime && (
+                            <div className="flex items-center gap-2 text-orange-400 text-xs">
+                                <Clock size={12} />
+                                <span>{remainingTime} sonra silinecek</span>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' :
