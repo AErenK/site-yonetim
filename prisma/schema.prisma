@@ -43,6 +43,9 @@ model Task {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  expiresAt       DateTime?
+  isPermanent     Boolean   @default(false)
 }
 
 model Notification {
