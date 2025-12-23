@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { createTask, approveTask, deleteTask, extendTask } from "@/actions/task";
 import { markAsRead } from "@/actions/notification";
-import { resetSystem } from "@/actions/admin";
-import { Bell, CheckCircle, Clock, Plus, User, Trash2, RefreshCw, BarChart3, Users, CheckSquare, AlertTriangle } from "lucide-react";
+import { Bell, CheckCircle, Clock, Plus, User, Trash2, RefreshCw, BarChart3, Users, CheckSquare } from "lucide-react";
 import { PushManager } from "@/components/PushManager";
 import { UserList } from "@/components/UserList";
 
@@ -54,18 +53,6 @@ export default async function AdminPage() {
                         )}
                     </div>
                     <PushManager />
-                    <form action={async () => {
-                        'use server'
-                        await resetSystem()
-                    }}>
-                        <button 
-                            className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors text-sm border border-red-500/20"
-                            title="Tüm verileri sil ve sistemi sıfırla"
-                        >
-                            <AlertTriangle size={16} />
-                            Sıfırla
-                        </button>
-                    </form>
                     <LogoutButton />
                 </div>
             </header>
