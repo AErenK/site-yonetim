@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { createTask, approveTask, deleteTask, extendTask } from "@/actions/task";
 import { markAsRead } from "@/actions/notification";
-import { Bell, CheckCircle, Clock, Plus, User, Trash2, RefreshCw } from "lucide-react";
+import { Bell, CheckCircle, Clock, Plus, User, Trash2, RefreshCw, BarChart3, Users, CheckSquare } from "lucide-react";
 import { PushManager } from "@/components/PushManager";
 import { UserList } from "@/components/UserList";
 
@@ -15,6 +15,10 @@ export default async function AdminPage() {
     const employees = await prisma.user.findMany({
         where: { role: "EMPLOYEE" },
     });
+
+    const totalTasks = await prisma.task.count();
+    const pendingTasks = await prisma.task.count({ where: { status: "PENDING" } });
+    const completedTasks = await prisma.task.count({ where: { status: "APPROVED" } });
 
     const tasks = await prisma.task.findMany({
         where: {
@@ -34,16 +38,16 @@ export default async function AdminPage() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
-            <header className="flex justify-between items-center mb-12">
+            <header className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-white">Yönetici Paneli</h1>
                     <p className="text-slate-400">Hoş geldin, {session.name}</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <Bell className="text-slate-400" />
+                        <Bell className="text-slate-400 hover:text-white transition-colors cursor-pointer" />
                         {notifications.length > 0 && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white">
+                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white animate-pulse">
                                 {notifications.length}
                             </span>
                         )}
@@ -52,6 +56,31 @@ export default async function AdminPage() {
                     <LogoutButton />
                 </div>
             </header>
+
+            {/* İstatistik Kartları */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl backdrop-blur-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-slate-400 font-medium">Toplam Görev</h3>
+                        <BarChart3 className="text-blue-500" size={20} />
+                    </div>
+                    <p className="text-3xl font-bold text-white">{totalTasks}</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl backdrop-blur-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-slate-400 font-medium">Bekleyen</h3>
+                        <Clock className="text-yellow-500" size={20} />
+                    </div>
+                    <p className="text-3xl font-bold text-white">{pendingTasks}</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl backdrop-blur-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-slate-400 font-medium">Tamamlanan</h3>
+                        <CheckSquare className="text-green-500" size={20} />
+                    </div>
+                    <p className="text-3xl font-bold text-white">{completedTasks}</p>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Görev Atama Formu */}
@@ -63,64 +92,76 @@ export default async function AdminPage() {
                         <form action={async (formData) => {
                             'use server'
                             await createTask(formData)
-                        }} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Çalışan Seç</label>
-                                <select
-                                    name="assignedToId"
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    required
-                                >
-                                    <option value="">Seçiniz...</option>
-                                    {employees.map((emp) => (
-                                        <option key={emp.id} value={emp.id}>
-                                            {emp.name}
-                                        </option>
-                                    ))}
-                                </select>
+                        }} className="space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider">Çalışan Seç</label>
+                                <div className="relative">
+                                    <select
+                                        name="assignedToId"
+                                        className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all appearance-none"
+                                        required
+                                    >
+                                        <option value="">Personel Seçiniz...</option>
+                                        {employees.map((emp) => (
+                                            <option key={emp.id} value={emp.id}>
+                                                {emp.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <User className="absolute right-3 top-3 text-slate-500 pointer-events-none" size={16} />
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Site İsmi</label>
+                            
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider">Site İsmi</label>
                                 <input
                                     type="text"
                                     name="siteName"
                                     placeholder="Örn: Kartepe Konutları"
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder:text-slate-600"
                                     required
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Görev Başlığı</label>
+
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider">Görev Başlığı</label>
                                 <input
                                     type="text"
                                     name="title"
                                     placeholder="Örn: Asansör Bakımı"
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder:text-slate-600"
                                     required
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Açıklama</label>
+
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider">Açıklama</label>
                                 <textarea
                                     name="description"
                                     rows={3}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    placeholder="Görev detaylarını buraya giriniz..."
+                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder:text-slate-600 resize-none"
                                 ></textarea>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    name="isPermanent"
-                                    id="isPermanent"
-                                    className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-blue-600 focus:ring-blue-500"
-                                />
-                                <label htmlFor="isPermanent" className="text-sm text-slate-400">
-                                    Kalıcı Görev (30 gün sonra silinmesin)
+
+                            <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-lg border border-slate-800">
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        name="isPermanent"
+                                        id="isPermanent"
+                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-600 bg-slate-800 transition-all checked:border-blue-500 checked:bg-blue-500 hover:border-slate-500"
+                                    />
+                                    <CheckCircle className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" size={12} />
+                                </div>
+                                <label htmlFor="isPermanent" className="text-sm text-slate-300 cursor-pointer select-none">
+                                    Kalıcı Görev <span className="text-slate-500 text-xs block">(30 gün sonra otomatik silinmez)</span>
                                 </label>
                             </div>
+
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
+                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-lg shadow-blue-900/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 Görevi Ata
                             </button>

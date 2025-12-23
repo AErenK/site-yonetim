@@ -3,7 +3,7 @@ import { getSession } from "@/actions/auth";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { TaskCard } from "@/components/TaskCard";
-import { Bell } from "lucide-react";
+import { Bell, ClipboardList } from "lucide-react";
 import { markAsRead } from "@/actions/notification";
 import { PushManager } from "@/components/PushManager";
 
@@ -30,9 +30,9 @@ export default async function EmployeePage() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <Bell className="text-slate-400" />
+                        <Bell className="text-slate-400 hover:text-white transition-colors cursor-pointer" />
                         {notifications.length > 0 && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white">
+                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white animate-pulse">
                                 {notifications.length}
                             </span>
                         )}
@@ -43,17 +43,19 @@ export default async function EmployeePage() {
             </header>
 
             {notifications.length > 0 && (
-                <div className="mb-8 bg-blue-900/20 border border-blue-900/50 rounded-xl p-4">
-                    <h3 className="text-blue-400 font-medium mb-2">Yeni Bildirimler</h3>
+                <div className="mb-8 bg-blue-900/20 border border-blue-900/50 rounded-xl p-4 animate-in slide-in-from-top-2">
+                    <h3 className="text-blue-400 font-medium mb-2 flex items-center gap-2">
+                        <Bell size={16} /> Yeni Bildirimler
+                    </h3>
                     <div className="space-y-2">
                         {notifications.map((notif) => (
-                            <div key={notif.id} className="flex justify-between items-center text-sm text-slate-300">
+                            <div key={notif.id} className="flex justify-between items-center text-sm text-slate-300 bg-blue-900/10 p-3 rounded-lg">
                                 <span>{notif.message}</span>
                                 <form action={async () => {
                                     'use server'
                                     await markAsRead(notif.id)
                                 }}>
-                                    <button className="text-blue-500 hover:text-blue-400">Okundu</button>
+                                    <button className="text-blue-500 hover:text-blue-400 font-medium text-xs uppercase tracking-wide">Okundu</button>
                                 </form>
                             </div>
                         ))}
@@ -67,8 +69,12 @@ export default async function EmployeePage() {
                 ))}
 
                 {tasks.length === 0 && (
-                    <div className="col-span-full text-center py-12 text-slate-500">
-                        Henüz atanmış bir görev bulunmuyor.
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-slate-900/30 rounded-xl border border-slate-800/50 border-dashed">
+                        <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
+                            <ClipboardList size={32} className="text-slate-600" />
+                        </div>
+                        <h3 className="text-lg font-medium text-slate-400 mb-1">Henüz Görev Yok</h3>
+                        <p className="text-sm text-slate-600">Şu an için size atanmış bir görev bulunmuyor.</p>
                     </div>
                 )}
             </div>
