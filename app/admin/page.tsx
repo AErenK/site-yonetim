@@ -61,11 +61,6 @@ export default async function AdminPage() {
                         <button 
                             className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors text-sm border border-red-500/20"
                             title="Tüm verileri sil ve sistemi sıfırla"
-                            onClick={(e) => {
-                                // This is a server component, so we can't use onClick for confirmation easily without client component.
-                                // But for this quick fix, we'll just let it run.
-                                // Ideally this should be a client component with confirmation.
-                            }}
                         >
                             <AlertTriangle size={16} />
                             Sıfırla
