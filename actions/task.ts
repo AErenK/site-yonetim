@@ -16,10 +16,14 @@ export async function createTask(formData: FormData) {
     const description = formData.get('description') as string
     const assignedToId = formData.get('assignedToId') as string
     const siteName = formData.get('siteName') as string
+    const isPermanent = formData.get('isPermanent') === 'on'
 
     if (!title || !assignedToId || !siteName) {
         return { error: 'Eksik bilgi.' }
     }
+
+    // Calculate expiration date (30 days from now) if not permanent
+    const expiresAt = isPermanent ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
     const task = await prisma.task.create({
         data: {
@@ -29,6 +33,8 @@ export async function createTask(formData: FormData) {
             createdById: session.id,
             siteName,
             status: 'PENDING',
+            isPermanent,
+            expiresAt,
         },
     })
 
