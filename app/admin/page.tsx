@@ -171,6 +171,20 @@ export default async function AdminPage() {
                                             </span>
                                         </div>
                                         <p className="text-sm text-slate-400">{task.siteName} - {task.assignedTo.name}</p>
+                                        {!task.isPermanent && task.expiresAt && (
+                                            <p className="text-xs text-orange-400 mt-1 flex items-center gap-1">
+                                                <Clock size={12} />
+                                                {(() => {
+                                                    const now = new Date();
+                                                    const diff = new Date(task.expiresAt).getTime() - now.getTime();
+                                                    if (diff <= 0) return "Süresi doldu";
+                                                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                    if (days > 0) return `${days} gün kaldı`;
+                                                    return `${hours} saat kaldı`;
+                                                })()} sonra silinecek
+                                            </p>
+                                        )}
                                         {task.cost && (
                                             <p className="text-sm text-emerald-400 mt-1">Masraf: {task.cost} TL ({task.costDescription})</p>
                                         )}
