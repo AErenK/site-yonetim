@@ -136,7 +136,7 @@ export function TaskCard({ task }: { task: Task }) {
                 </form>
             )}
 
-            {task.status !== 'PENDING' && task.cost && (
+            {task.status !== 'PENDING' && task.cost !== null && (
                 <div className="mt-4 pt-4 border-t border-slate-800">
                     <div className="flex items-center gap-2 text-emerald-400 text-sm">
                         <AlertCircle size={14} />
