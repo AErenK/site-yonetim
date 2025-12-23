@@ -17,6 +17,12 @@ export default async function AdminPage() {
     });
 
     const tasks = await prisma.task.findMany({
+        where: {
+            OR: [
+                { isPermanent: true },
+                { expiresAt: { gt: new Date() } }
+            ]
+        },
         include: { assignedTo: true },
         orderBy: { createdAt: "desc" },
     });
@@ -101,6 +107,17 @@ export default async function AdminPage() {
                                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 ></textarea>
                             </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    name="isPermanent"
+                                    id="isPermanent"
+                                    className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-blue-600 focus:ring-blue-500"
+                                />
+                                <label htmlFor="isPermanent" className="text-sm text-slate-400">
+                                    Kalıcı Görev (30 gün sonra silinmesin)
+                                </label>
+                            </div>
                             <button
                                 type="submit"
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
@@ -159,16 +176,41 @@ export default async function AdminPage() {
                                         )}
                                     </div>
 
-                                    {task.status === 'COMPLETED' && (
+import { deleteTask, extendTask } from "@/actions/task";
+import { Trash2, RefreshCw } from "lucide-react";
+
+// ... existing code ...
+
+                                    <div className="flex items-center gap-2">
+                                        {task.status === 'COMPLETED' && (
+                                            <form action={async () => {
+                                                'use server'
+                                                await approveTask(task.id)
+                                            }}>
+                                                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                                    Onayla
+                                                </button>
+                                            </form>
+                                        )}
+                                        
                                         <form action={async () => {
                                             'use server'
-                                            await approveTask(task.id)
+                                            await extendTask(task.id)
                                         }}>
-                                            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                                                Onayla
+                                            <button title="Süreyi Uzat (30 Gün)" className="p-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg transition-colors">
+                                                <RefreshCw size={16} />
                                             </button>
                                         </form>
-                                    )}
+
+                                        <form action={async () => {
+                                            'use server'
+                                            await deleteTask(task.id)
+                                        }}>
+                                            <button title="Görevi Sil" className="p-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg transition-colors">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             ))}
                         </div>
